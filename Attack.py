@@ -108,12 +108,12 @@ for epoch in range(args.epochs):
         if predicted[0] != label and predicted[0].data.cpu().numpy() != args.target:
              train_actual_total += 1
              applied_patch, mask, x_location, y_location = mask_generation(args.patch_type, patch, image_size=(3, 224, 224))
-             perturbated_image, applied_patch = patch_attack(image, applied_patch, mask, args.target, args.probability_threshold, model, args.lr, args.max_iteration)
-             perturbated_image = torch.from_numpy(perturbated_image).cuda()
+             perturbated_image_org, applied_patch = patch_attack(image, applied_patch, mask, args.target, args.probability_threshold, model, args.lr, args.max_iteration)
+             perturbated_image = torch.from_numpy(perturbated_image_org).cuda()
              output = model(perturbated_image)
              _, predicted = torch.max(output.data, 1)
              if not displayed:
-                 plt.imshow(np.clip(np.transpose(np.squeeze(perturbated_image), (1, 2, 0)), 0, 1))
+                 plt.imshow(np.clip(np.transpose(np.squeeze(perturbated_image_org), (1, 2, 0)), 0, 1))
                  plt.savefig("training_pictures/test_image_%d.png" % epoch)
                  print("original: %d   attacked: %d" % (label.data.cpu().numpy(),predicted[0].data.cpu().numpy()))
                  displayed = True
