@@ -74,7 +74,7 @@ def patch_attack(image, applied_patch, mask, target, probability_threshold, mode
 os.environ["CUDA_VISIBLE_DEVICES"] = args.GPU
 
 # Load the model
-model = models.resnet50(pretrained=True).cuda()
+model = models.mobilenet_v2(pretrained=True).cuda()
 model.eval()
 
 # Load the datasets
