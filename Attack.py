@@ -117,7 +117,7 @@ for epoch in range(args.epochs):
     mean, std = [0.485, 0.456, 0.406], [0.229, 0.224, 0.225]
     plt.imshow(np.clip(np.transpose(patch, (1, 2, 0)) * std + mean, 0, 1))
     plt.savefig("training_pictures/" + str(epoch) + " patch.png")
-    print("Epoch:{} Patch attack success rate on trainset: {:.3f}%".format(epoch, 100 * train_success / train_actual_total))
+    # print("Epoch:{} Patch attack success rate on trainset: {:.3f}%".format(epoch, 100 * train_success / train_actual_total))
     train_success_rate = test_patch(args.patch_type, args.target, patch, test_loader, model)
     print("Epoch:{} Patch attack success rate on trainset: {:.3f}%".format(epoch, 100 * train_success_rate))
     test_success_rate = test_patch(args.patch_type, args.target, patch, test_loader, model)
