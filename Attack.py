@@ -97,6 +97,7 @@ best_patch_epoch, best_patch_success_rate = 0, 0
 # Generate the patch
 for epoch in range(args.epochs):
     train_total, train_actual_total, train_success = 0, 0, 0
+    displayed = False
     for (image, label) in train_loader:
         train_total += label.shape[0]
         assert image.shape[0] == 1, 'Only one picture should be loaded each time.'
@@ -111,18 +112,27 @@ for epoch in range(args.epochs):
              perturbated_image = torch.from_numpy(perturbated_image).cuda()
              output = model(perturbated_image)
              _, predicted = torch.max(output.data, 1)
+             if not displayed:
+                 plt.imshow(np.clip(np.transpose(np.squeeze(perturbated_image), (1, 2, 0)), 0, 1))
+                 plt.savefig("training_pictures/test_image_%d.png" % epoch)
+                 print("original: %d   attacked: %d" % (label.data.cpu().numpy(),predicted[0].data.cpu().numpy()))
+                 displayed = True
              if predicted[0].data.cpu().numpy() == args.target:
-                 train_success += 1
+                train_success += 1
              patch = applied_patch[0][:, x_location:x_location + patch.shape[1], y_location:y_location + patch.shape[2]]
     mean, std = [0.485, 0.456, 0.406], [0.229, 0.224, 0.225]
     plt.imshow(np.clip(np.transpose(patch, (1, 2, 0)) * std + mean, 0, 1))
-    plt.savefig("training_pictures/" + str(epoch) + " patch.png")
+    imgname = "training_pictures/" + str(epoch) + " patch.png"
+    plt.savefig(imgname)
+    print("saved: " + imgname)
+
     # print("Epoch:{} Patch attack success rate on trainset: {:.3f}%".format(epoch, 100 * train_success / train_actual_total))
     train_success_rate = test_patch(args.patch_type, args.target, patch, test_loader, model)
     print("Epoch:{} Patch attack success rate on trainset: {:.3f}%".format(epoch, 100 * train_success_rate))
     test_success_rate = test_patch(args.patch_type, args.target, patch, test_loader, model)
     print("Epoch:{} Patch attack success rate on testset: {:.3f}%".format(epoch, 100 * test_success_rate))
-
+    
+    
     # Record the statistics
     with open(args.log_dir, 'a') as f:
         writer = csv.writer(f)
